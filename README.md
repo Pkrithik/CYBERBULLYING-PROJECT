@@ -1,178 +1,143 @@
-# CYBERBULLYING-PROJECT
-COLLEGE PROJECT
-# CyberShield – Cyberbullying Detection System
+# Cyberbullying Detection System
 
-CyberShield is an MCA project for detecting potentially harmful and cyberbullying-related messages using a combination of **Machine Learning and rule-based text analysis**.
+A web-based cyberbullying detection system developed as an MCA academic project.
 
-The system provides a web interface where a user can enter a message and receive an analysis of the message.
+The system analyzes text messages using a combination of a machine-learning classifier and rule-based text analysis. The hybrid approach is designed to identify potentially harmful or cyberbullying-related messages while avoiding the assumption that every offensive word automatically represents cyberbullying.
 
 ---
 
 ## Project Overview
 
-The system uses a hybrid detection approach instead of relying only on a machine-learning classifier.
+Cyberbullying can involve direct insults, abusive language, harassment, and other forms of harmful communication.
 
-The message passes through multiple stages:
+This project provides a text-based detection system that combines:
 
-1. Text preprocessing
-2. Machine Learning classification
-3. Explicit toxic-word detection
-4. Targeted-abuse detection
-5. Hybrid decision-making
-6. Cyberbullying report storage in SQLite
+- Machine Learning classification
+- TF-IDF text representation
+- Toxic-word detection
+- Targeted-abuse detection
+- Hybrid decision-making
+- SQLite-based incident logging
+- A web-based frontend
 
-The final result can be classified as:
+The system returns one of three main outcomes:
 
-- **Cyberbullying**
 - **Safe**
+- **Cyberbullying**
 - **Review**
 
-The `Review` category is used when offensive language is detected but the system cannot confidently determine that the message is targeted cyberbullying.
+`Review` is used when offensive language is detected but the available rules do not clearly establish targeted cyberbullying.
 
 ---
 
-## Main Technologies
-
-### Backend
-
-- Python
-- Flask
-- Flask-CORS
-- Scikit-learn
-- NLTK
-- SQLite
-
-### Frontend
-
-- HTML
-- CSS
-- JavaScript
-
-### Machine Learning
-
-- TF-IDF Vectorization
-- SGDClassifier
-- Scikit-learn
-
-### Database
-
-- SQLite
-
----
-
-## Project Structure
+## System Architecture
 
 ```text
-CYBERBULLYING-PROJECT/
-│
-├── app.py
-├── cyberbullying-project.py
-├── hybrid_engine.py
-├── train_model.py
-├── bad_words.txt
-├── cyberbullying.db
-├── tfidfvectorizer11.pkl
-│
-├── models/
-│   ├── SGDClassifier_model.pkl
-│   ├── LinearSVC_model.pkl
-│   └── vectorizer.pkl
-│
-├── templates/
-│   ├── index.html
-│   └── result.html
-│
-├── static/
-│   ├── css/
-│   │   └── style.css
-│   │
-│   └── js/
-│       └── script.js
-│
-├── data1.csv
-├── model.ipynb
-├── stopwords.txt
-└── .gitignore
+                    User
+                     │
+                     ▼
+             Web Frontend
+          HTML / CSS / JavaScript
+                     │
+                     ▼
+                Flask API
+                 app.py
+                     │
+                     ▼
+             Text Preprocessing
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+          ▼                     ▼
+   Machine Learning       Rule-Based Analysis
+      Prediction                  │
+          │              ┌────────┼────────┐
+          │              │        │        │
+          │              ▼        ▼        ▼
+          │          Toxic Words  Targeted Abuse
+          │
+          └──────────┬───────────┘
+                     ▼
+             Hybrid Decision
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+        Safe     Review   Cyberbullying
+                                │
+                                ▼
+                         SQLite Database
 
+Main Features
+1. Machine Learning Detection
 
-How the System Works
-1. User Input
+The application uses a trained machine-learning classifier to classify processed text.
 
-The user enters a message through the CyberShield web interface.
+The Flask application currently loads:
 
-Example:
+models/SGDClassifier_model.pkl
 
-you are ugly
+The classifier produces a binary prediction:
 
-The frontend sends the message to the Flask backend.
+0 → Safe
+1 → Cyberbullying
 
-2. Flask API
+The ML model is used together with the rule-based detection layer to produce the final result.
 
-The backend is implemented in:
+2. TF-IDF Text Representation
 
-app.py
+The input text is converted into numerical features using a trained TF-IDF vectorizer.
 
-The main API endpoint is:
+The application loads:
 
-POST /validate-comment
+models/vectorizer.pkl
 
-The endpoint accepts JSON data:
+The vectorizer transforms incoming text before it is passed to the machine-learning classifier.
 
-{
-    "text": "you are ugly"
-}
+The application uses transform() on new messages rather than fitting a new vectorizer for every individual message.
+
 3. Text Preprocessing
 
-The message is processed by:
+Text preprocessing is implemented in:
 
 hybrid_engine.py
 
-The preprocessing stage performs operations such as:
+The preprocessing stage includes operations such as:
 
-Removing mentions
+Removing user mentions
 Removing unwanted characters
 Converting text to lowercase
 Tokenization
 Lemmatization
 
-The same preprocessing approach is intended to be used before ML prediction.
+The processed text is then supplied to the trained TF-IDF vectorizer.
 
-4. Machine Learning Detection
+4. Toxic Word Detection
 
-The processed message is converted into numerical features using the trained TF-IDF vectorizer.
+The project contains a rule-based toxic-word detector.
 
-The vectorizer is loaded from:
-
-models/vectorizer.pkl
-
-The trained classification model is loaded from:
-
-models/SGDClassifier_model.pkl
-
-The ML classifier produces a binary prediction:
-
-0 → Safe
-1 → Cyberbullying
-5. Rule-Based Detection
-
-The project also contains rule-based detection in:
-
-hybrid_engine.py
-Toxic Word Detection
-
-The system loads explicit words from:
+The word list is stored in:
 
 bad_words.txt
 
-The words are checked using token-aware matching.
+The system loads the words from this file and checks incoming messages using token-aware matching.
 
-This allows the system to identify explicit toxic language that the ML model may not detect correctly.
+This rule-based layer provides an additional detection mechanism alongside the machine-learning classifier.
 
-Targeted Abuse Detection
+Important
 
-The system also checks whether potentially abusive language is directed toward another person.
+The presence of an offensive word does not automatically mean that the final result is cyberbullying.
 
-Examples of targeted patterns include phrases such as:
+The system also considers whether potentially abusive language appears to be targeted.
+
+5. Targeted Abuse Detection
+
+The project contains a targeted-abuse detection function in:
+
+hybrid_engine.py
+
+It looks for patterns indicating that potentially abusive language is directed toward another person.
+
+Examples of patterns handled by the current rule-based system include expressions involving:
 
 you are ...
 you look ...
@@ -182,60 +147,90 @@ go die
 kill yourself
 shut up
 
-Targeted detection is not based on the word you alone.
+The system does not treat the presence of the word you alone as sufficient evidence of cyberbullying.
 
-The purpose is to determine whether potentially offensive language is actually being directed at a person.
+Hybrid Decision System
 
-6. Hybrid Decision Engine
-
-The final decision is made by:
+The final decision is produced by:
 
 hybrid_decision()
 
-The system combines:
+This function combines:
 
-ML prediction
+Machine-learning prediction
 Toxic-word detection
 Targeted-abuse detection
+Case 1 — Machine Learning detects cyberbullying
 
-The basic decision logic is:
+If:
 
-ML detects cyberbullying
-ML = 1
+ML prediction = 1
 
-Final result:
+the final classification is:
 
 Cyberbullying
-ML is safe but toxic language is targeted
-ML = 0
-Toxic words = Yes
+Case 2 — ML predicts safe but targeted toxic language is detected
+
+If:
+
+ML prediction = 0
+Toxic word detected = Yes
 Targeted abuse = Yes
 
-Final result:
+the hybrid system classifies the message as:
 
 Cyberbullying
-Toxic language exists but targeting is unclear
-ML = 0
-Toxic words = Yes
+
+This allows the rule-based layer to identify cases that the ML classifier may miss.
+
+Case 3 — Toxic language without clear targeting
+
+If:
+
+ML prediction = 0
+Toxic word detected = Yes
 Targeted abuse = No
 
-Final result:
+the system returns:
 
 Review
 
-This avoids automatically classifying every offensive word as cyberbullying.
+This is important because offensive language does not always constitute cyberbullying.
 
-No harmful indicators
-ML = 0
-Toxic words = No
+For example, an offensive word used in a non-targeted context should not automatically be treated as a personal cyberbullying incident.
 
-Final result:
+Case 4 — No detected harmful indicators
+
+If:
+
+ML prediction = 0
+Toxic word detected = No
+
+the result is:
 
 Safe
-Classification Results
+API
 
-The API can return information such as:
+The Flask application provides the following main endpoint:
 
+POST /validate-comment
+
+The endpoint accepts a JSON request.
+
+Example Request
+{
+    "text": "Have a great day!"
+}
+Example Safe Response
+{
+    "prediction": 0,
+    "label": "safe",
+    "toxic_word_detected": false,
+    "targeted_abuse": false,
+    "status": "allowed",
+    "message": "No cyberbullying detected."
+}
+Example Cyberbullying Response
 {
     "prediction": 1,
     "label": "cyberbullying",
@@ -245,100 +240,166 @@ The API can return information such as:
     "message": "Cyberbullying detected."
 }
 
-For a safe message, the result can contain:
+The exact message returned can depend on which part of the hybrid detection system produced the final decision.
 
-{
-    "prediction": 0,
-    "label": "safe",
-    "toxic_word_detected": false,
-    "targeted_abuse": false,
-    "status": "allowed",
-    "message": "No cyberbullying detected."
-}
+Web Frontend
+
+The project includes a browser-based frontend.
+
+The frontend is located in:
+
+templates/
+static/
+HTML
+templates/index.html
+templates/result.html
+CSS
+static/css/style.css
+JavaScript
+static/js/script.js
+
+The frontend communicates with the Flask backend and displays the analysis result to the user.
+
 Database
 
-The project uses:
+The project uses SQLite for storing detected cyberbullying reports.
+
+Database file:
 
 cyberbullying.db
 
-SQLite is used to store detected cyberbullying incidents.
+The database contains a reports table.
 
-The main table is:
-
-reports
-
-The table contains:
-
-Column	Type	Description
+Reports Table
+Column	Type	Purpose
 id	INTEGER	Unique report ID
 content	TEXT	Detected message
-user_ip	TEXT	IP address
+user_ip	TEXT	IP address associated with the request
 account_name	TEXT	Account/user name
-timestamp	DATETIME	Time of detection
+timestamp	DATETIME	Time of the report
 
-When the final decision is cyberbullying, the message can be stored in the database.
+When the final hybrid decision is classified as cyberbullying, the message is recorded in the database.
 
-Web Interface
+Project Structure
+CYBERBULLYING-PROJECT/
+│
+├── app.py
+├── cyberbullying-project.py
+├── hybrid_engine.py
+├── train_model.py
+│
+├── bad_words.txt
+├── cyberbullying.db
+├── tfidfvectorizer11.pkl
+│
+├── data1.csv
+├── model.ipynb
+├── stopwords.txt
+├── requirements.txt
+├── README.md
+├── .gitignore
+│
+├── models/
+│   ├── LinearSVC_model.pkl
+│   ├── SGDClassifier_model.pkl
+│   └── vectorizer.pkl
+│
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── script.js
+│
+└── templates/
+    ├── index.html
+    └── result.html
+Important Files
+app.py
 
-The frontend is served by Flask.
+Main Flask application.
 
-The main page is:
+Responsibilities include:
 
-templates/index.html
+Starting the Flask server
+Loading the trained model
+Loading the TF-IDF vectorizer
+Receiving text from the frontend/API
+Performing prediction
+Calling the hybrid decision engine
+Logging cyberbullying reports
+hybrid_engine.py
 
-The result page is:
+Contains the hybrid text-analysis logic.
 
-templates/result.html
+Responsibilities include:
 
-Frontend styling is located at:
+Text preprocessing
+Toxic-word detection
+Targeted-abuse detection
+Combining ML and rule-based results
+train_model.py
 
-static/css/style.css
+Contains the model-training process used to generate the trained machine-learning resources.
 
-Frontend JavaScript is located at:
+model.ipynb
 
-static/js/script.js
+Jupyter Notebook containing the original machine-learning experimentation/training work.
 
-The interface allows the user to:
+data1.csv
 
-Enter a message
-Submit the message
-Send the message to the Flask API
-Receive the detection result
-View the classification details
-Running the Project
-Step 1 – Install Python
+Dataset used for machine-learning training.
 
-Make sure Python is installed.
+bad_words.txt
 
-Check:
+Contains the rule-based list of explicit toxic words.
 
-python --version
-Step 2 – Install Required Packages
+cyberbullying.db
 
-Run:
+SQLite database used to store detected cyberbullying reports.
+
+models/
+
+Contains the trained machine-learning resources.
+
+The Flask application currently uses:
+
+SGDClassifier_model.pkl
+vectorizer.pkl
+
+LinearSVC_model.pkl is also present in the project as a trained model resource.
+
+Installation
+1. Clone the Repository
+git clone https://github.com/Pkrithik/CYBERBULLYING-PROJECT.git
+2. Enter the Project Directory
+cd CYBERBULLYING-PROJECT
+3. Install Dependencies
+
+If requirements.txt contains the required packages:
+
+pip install -r requirements.txt
+
+Alternatively, the main packages used by the project include:
 
 pip install flask flask-cors scikit-learn nltk pandas numpy
 
-If required by the existing project:
+Additional packages may be required for the external API functionality contained in cyberbullying-project.py.
 
-pip install google-api-python-client requests
-Step 3 – Start the Flask Application
+Running the Application
 
 From the project directory:
 
 python app.py
 
-The server should start at:
+The Flask development server should start at:
 
 http://127.0.0.1:5000
 
-Open this address in a browser.
+Open the address in a web browser.
 
 Testing the API
 
-PowerShell can be used to test the API.
-
-Example:
+PowerShell example:
 
 Invoke-RestMethod `
 -Uri "http://127.0.0.1:5000/validate-comment" `
@@ -353,99 +414,92 @@ Invoke-RestMethod `
 -Method POST `
 -ContentType "application/json" `
 -Body '{"text":"you are ugly"}'
-Machine Learning Model Files
+Machine Learning Resources
 
-The trained model files are stored in:
+The project contains the following trained resources:
 
-models/
+models/SGDClassifier_model.pkl
+models/LinearSVC_model.pkl
+models/vectorizer.pkl
 
-Currently included model resources include:
-
-SGDClassifier_model.pkl
-LinearSVC_model.pkl
-vectorizer.pkl
-
-The Flask application currently loads:
+The current Flask application loads:
 
 SGDClassifier_model.pkl
 vectorizer.pkl
-Training
 
-The project contains:
+The vectorizer is used to transform incoming text into the feature representation expected by the classifier.
 
-train_model.py
+External API Functionality
 
-and the original notebook:
-
-model.ipynb
-
-The training dataset is:
-
-data1.csv
-
-The purpose of the training script is to generate the machine-learning model and vectorizer used by the application.
-
-External API Integration
-
-The original project also contains integration functionality for external platforms.
-
-These include:
-
-YouTube Data API
-Instagram Graph API
-IP address lookup through IPify
-
-The external-platform functionality is primarily contained in:
+The original project also contains external-platform integration code in:
 
 cyberbullying-project.py
 
-The Flask web interface currently uses the local message-validation API provided by:
+This code contains functionality related to:
+
+YouTube comments
+Instagram comments
+IP address retrieval
+
+These functions are separate from the primary local text-validation flow provided by:
 
 app.py
-Security
 
-API credentials should not be hardcoded into the source code.
+External API credentials should be supplied through environment variables rather than being stored directly in source code.
 
-Environment variables should be used for external API credentials.
+Limitations
 
-For example:
+This is an academic machine-learning project and the detection system is not guaranteed to identify every instance of cyberbullying.
 
-YOUTUBE_API_KEY
-
-The .gitignore file should also be used to prevent sensitive configuration files and unnecessary generated files from being committed.
-
-Important Limitations
-
-CyberShield is an academic MCA project and its classification results should not be considered perfect.
-
-Machine-learning predictions can produce:
+Possible limitations include:
 
 False positives
 False negatives
+Context-dependent language
+Sarcasm
+Slang
+Misspellings
+New or previously unseen abusive expressions
+Limitations of the training dataset
+Limitations of rule-based pattern matching
 
-Rule-based detection can also have limitations because offensive language can depend heavily on context.
+The hybrid approach is intended to improve detection by combining machine learning with explicit rule-based checks.
 
-Therefore, the system uses a hybrid approach to improve detection rather than relying on a single technique.
+Privacy and Security Considerations
 
-Project Objective
+The application stores detected cyberbullying reports in a local SQLite database.
 
-The primary objective of this project is to develop a system capable of identifying potentially cyberbullying messages by combining:
+The database may contain:
 
-Machine Learning
-        +
-TF-IDF Text Representation
-        +
-Rule-Based Toxic Word Detection
-        +
-Targeted Abuse Detection
-        =
-Hybrid Cyberbullying Detection
-Academic Information
+Message content
+IP address
+Account name
+Timestamp
 
-Project: Cyberbullying Detection System
+Therefore, the database should be handled carefully when deploying the application in a real-world environment.
+
+The project should not be considered production-ready without additional security, privacy, authentication, access-control, and data-protection measures.
+
+Future Enhancements
+
+Possible future improvements include:
+
+Improved contextual cyberbullying detection
+Larger and more diverse training datasets
+Better handling of slang and misspellings
+Multilingual detection
+Improved sarcasm detection
+Advanced NLP models
+Visualization of detection statistics
+Administrative reporting interface
+Improved social-media integration
+More sophisticated harassment and abuse classification
+Academic Project
+
+Project Title: Cyberbullying Detection System
 
 Degree: Master of Computer Applications (MCA)
 
-Purpose: Academic Mini Project / Project Work
-
 Domain: Machine Learning / Natural Language Processing / Web Application
+
+Purpose: Academic Project
