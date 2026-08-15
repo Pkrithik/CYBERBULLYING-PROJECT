@@ -1,0 +1,48 @@
+# Insults and General Toxicity
+stupid
+idiot
+dumb
+dumbass
+loser
+ugly
+fat
+disgusting
+pathetic
+worthless
+useless
+moron
+retard
+bad
+bulshit
+
+# Profanity and Expletives
+fuck
+fucking
+fucker
+shit
+shitty
+bullshit
+bitch
+asshole
+bastard
+cunt
+dick
+cock
+pussy
+slut
+whore
+
+# Threats and Extreme Abuse
+kill
+die
+suicide
+murder
+rape
+destroy
+
+# Discriminatory / Slurs (Generic representation for testing)
+# Note: Real systems would include comprehensive lists, kept minimal here for project scope
+faggot
+nigger
+chink
+spic

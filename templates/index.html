@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield | Cyberbullying Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <span class="icon">🛡️</span> CyberShield
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#technology">Technology</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Detect Harmful Messages Before They Cause Harm</h1>
+            <p>AI-powered cyberbullying detection using Natural Language Processing and Machine Learning.</p>
+        </section>
+
+        <section class="detection-section">
+            <div class="card detection-card" id="detection-card">
+                <h2>Analyze Message</h2>
+                <p>Enter a message or comment below to check whether it may contain cyberbullying.</p>
+                <div class="input-group">
+                    <label for="message-input" class="sr-only">Message to analyze</label>
+                    <textarea id="message-input" placeholder="Type or paste a message here..." rows="5"></textarea>
+                    <div class="counter"><span id="char-count">0</span> characters</div>
+                </div>
+                <div class="actions">
+                    <button id="clear-btn" class="btn btn-secondary">Clear</button>
+                    <button id="analyze-btn" class="btn btn-primary">Analyze Message</button>
+                </div>
+                <div id="error-message" class="error-message hidden"></div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="card loading-card hidden" id="loading-card">
+                <div class="spinner"></div>
+                <p>Analyzing message with AI...</p>
+            </div>
+
+            <!-- Result Card -->
+            <div class="card result-card hidden" id="result-card">
+                <div class="result-header">
+                    <div id="result-icon" class="result-icon"></div>
+                    <h2 id="result-title">STATUS</h2>
+                </div>
+                <p id="result-subtitle" class="result-subtitle"></p>
+                
+                <div class="result-details">
+                    <div class="detail-row">
+                        <span class="label">Original Message:</span>
+                        <span id="result-original" class="value message-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">ML Classification:</span>
+                        <span id="result-prediction" class="value tag"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Toxic Word Detected:</span>
+                        <span id="result-toxic" class="value tag"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Targeted Abuse:</span>
+                        <span id="result-targeted" class="value tag"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Final Decision:</span>
+                        <span id="result-status-tag" class="value tag"></span>
+                    </div>
+                </div>
+                
+                <div class="explanation-box" id="explanation-box">
+                    <h3>Why was this flagged?</h3>
+                    <p id="explanation-text"></p>
+                </div>
+                
+                <button id="reset-btn" class="btn btn-primary mt-4">Analyze Another Message</button>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="info-section">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">01</div>
+                    <h3>Enter Message</h3>
+                    <p>Input the text or comment you want to verify into the system.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">02</div>
+                    <h3>AI Analysis</h3>
+                    <p>The system processes the text using NLP and a trained Machine Learning model.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">03</div>
+                    <h3>Detection Result</h3>
+                    <p>Receive an instant classification indicating if the message is safe or cyberbullying.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="technology" class="info-section alternate">
+            <h2>Technology Stack</h2>
+            <div class="tech-tags">
+                <span class="tech-tag">Natural Language Processing</span>
+                <span class="tech-tag">TF-IDF</span>
+                <span class="tech-tag">Machine Learning</span>
+                <span class="tech-tag">Flask</span>
+                <span class="tech-tag">SQLite</span>
+                <span class="tech-tag">Vanilla JS</span>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Cyberbullying Detection System &mdash; MCA Project</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

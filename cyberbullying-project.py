@@ -85,13 +85,17 @@ def handle_message(content: str, account_name: str):
 def send_message_to_public_area(content: str, account_name: str):
     print(f"Message from {account_name}: {content}")
 
-# Example usage
-handle_message("I hate you", "User123")
-handle_message("Have a great day", "User456")
+# Example usage (commented out to prevent auto-execution)
+# handle_message("I hate you", "User123")
+# handle_message("Have a great day", "User456")
 
 # YouTube Integration
 def fetch_youtube_comments(video_id):
-    api_key = 'YOUR_API_KEY'
+    api_key = os.environ.get('YOUTUBE_API_KEY')
+    if not api_key:
+        print("YOUTUBE_API_KEY not found in environment variables.")
+        return []
+        
     youtube = build('youtube', 'v3', developerKey=api_key)
 
     request = youtube.commentThreads().list(
@@ -114,9 +118,9 @@ def handle_youtube_comments(video_id):
     for comment, author in comments:
         handle_message(comment, author)
 
-# Example usage with YouTube video ID
+# Example usage with YouTube video ID (commented out to prevent auto-execution)
 youtube_video_id = 'VIDEO_ID'
-handle_youtube_comments(youtube_video_id)
+# handle_youtube_comments(youtube_video_id)
 
 # Instagram Integration
 def fetch_instagram_comments(post_id, access_token):
@@ -137,9 +141,9 @@ def handle_instagram_comments(post_id, access_token):
     for comment, author in comments:
         handle_message(comment, author)
 
-# Example usage with Instagram post ID and access token
+# Example usage with Instagram post ID and access token (commented out to prevent auto-execution)
 instagram_post_id = 'INSTAGRAM_POST_ID'
 instagram_access_token = 'YOUR_INSTAGRAM_ACCESS_TOKEN'
-handle_instagram_comments(instagram_post_id, instagram_access_token)
+# handle_instagram_comments(instagram_post_id, instagram_access_token)
 
 conn.close()
